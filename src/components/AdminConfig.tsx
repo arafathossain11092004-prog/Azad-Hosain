@@ -25,7 +25,7 @@ export function AdminConfig() {
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await setDoc(doc(db, 'config', 'main'), { videoCvUrl, heroTitle, heroSubtitle, heroDescription, youtubeLink });
+      await setDoc(doc(db, 'config', 'main'), { videoCvUrl, heroTitle, heroSubtitle, heroDescription, youtubeLink }, { merge: true });
       alert('Config updated successfully!');
     } catch (err: any) {
       alert(`Error updating config: ${err.message}`);
