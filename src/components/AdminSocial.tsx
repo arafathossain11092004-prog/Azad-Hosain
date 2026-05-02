@@ -35,7 +35,7 @@ export function AdminSocial() {
       const fetchedLinks = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
       fetchedLinks.sort((a: any, b: any) => a.order - b.order);
       setLinks(fetchedLinks);
-    });
+    }, (error) => console.error("Error fetching social links:", error));
   }, []);
 
   const handleAdd = async (e: React.FormEvent) => {
@@ -50,6 +50,7 @@ export function AdminSocial() {
         order: Number(order) 
       });
       setHref(''); setOrder(links.length + 1);
+      alert('Social link added successfully!');
     } catch(err: any) {
       alert(`Error adding link: ${err.message}`);
     }

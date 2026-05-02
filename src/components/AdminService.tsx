@@ -14,7 +14,7 @@ export function AdminService() {
       const fetched = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
       fetched.sort((a: any, b: any) => a.order - b.order);
       setServices(fetched);
-    });
+    }, (error) => console.error("Error fetching admin services:", error));
   }, []);
 
   const handleAdd = async (e: React.FormEvent) => {
@@ -22,6 +22,7 @@ export function AdminService() {
     try {
       await addDoc(collection(db, 'services'), { title, svgCode, description, order: Number(order) });
       setTitle(''); setSvgCode(''); setDescription(''); setOrder(order + 1);
+      alert('Service added successfully!');
     } catch (err: any) {
       alert(`Error adding service: ${err.message}`);
     }

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '../utils/firebase';
@@ -11,7 +12,7 @@ export function Contact() {
     const q = query(collection(db, 'socialLinks'), orderBy('order', 'asc'));
     const unsub = onSnapshot(q, (snapshot) => {
       setSocialLinks(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    });
+    }, (error) => console.error("Error fetching socialLinks:", error));
     return unsub;
   }, []);
 
@@ -88,7 +89,7 @@ export function Contact() {
         </motion.div>
 
         <div className="mt-24 pt-8 border-t border-neutral-900 flex flex-col md:flex-row justify-between items-center text-neutral-500 text-sm w-full font-light">
-          <p>© {new Date().getFullYear()} Azad Hossain. All rights reserved.</p>
+          <p>© <Link to="/admin" className="hover:text-white transition-colors">{new Date().getFullYear()}</Link> Azad Hossain. All rights reserved.</p>
           <p className="mt-4 md:mt-0 opacity-50 hover:opacity-100 transition-opacity">Designed & Dev By Arafat Hossain</p>
         </div>
       </div>

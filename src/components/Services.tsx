@@ -11,7 +11,7 @@ export function Services() {
     const q = query(collection(db, 'services'), orderBy('order', 'asc'));
     const unsub = onSnapshot(q, (snapshot) => {
       setServices(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    });
+    }, (error) => console.error("Error fetching services:", error));
     return unsub;
   }, []);
 

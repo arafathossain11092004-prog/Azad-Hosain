@@ -24,7 +24,7 @@ export function AdminPackage() {
       const fetched = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
       fetched.sort((a: any, b: any) => a.order - b.order);
       setPackages(fetched);
-    });
+    }, (error) => console.error("Error fetching admin packages:", error));
   }, []);
 
   const handleAddFeature = () => {
@@ -52,6 +52,7 @@ export function AdminPackage() {
     try {
       await addDoc(collection(db, 'packages'), { name, price, interval, description, features: finalFeatures, popular, order: Number(order) });
       setName(PACKAGE_NAMES[0]); setPrice(''); setInterval(''); setDescription(''); setFeatures(['']); setPopular(false); setOrder(order + 1);
+      alert('Package added successfully!');
     } catch(err: any) {
       alert(`Error adding package: ${err.message}`);
     }

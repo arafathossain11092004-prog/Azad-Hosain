@@ -18,7 +18,7 @@ export function About() {
       if (docSnap.exists()) {
         setProfile(docSnap.data() as any);
       }
-    });
+    }, (error) => console.error("Error fetching about profile:", error));
     return unsub;
   }, []);
   return (

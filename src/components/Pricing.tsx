@@ -11,7 +11,7 @@ export function Pricing() {
     const q = query(collection(db, 'packages'), orderBy('order', 'asc'));
     const unsub = onSnapshot(q, (snapshot) => {
       setPackages(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    });
+    }, (error) => console.error("Error fetching packages:", error));
     return unsub;
   }, []);
 

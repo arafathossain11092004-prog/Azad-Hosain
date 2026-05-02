@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, useInView } from 'motion/react';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { collection, onSnapshot, query, where, doc } from 'firebase/firestore';
 import { db } from '../utils/firebase';
 
 interface VideoCardProps {
@@ -90,6 +90,16 @@ function VideoCard({ project, index }: VideoCardProps) {
 
 export function ProjectGrid() {
   const [videos, setVideos] = useState<any[]>([]);
+  const [youtubeLink, setYoutubeLink] = useState('https://youtube.com');
+
+  useEffect(() => {
+    return onSnapshot(doc(db, 'config', 'main'), (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.youtubeLink) setYoutubeLink(data.youtubeLink);
+      }
+    }, (error) => console.error("Error fetching config for youtubeLink:", error));
+  }, []);
 
   useEffect(() => {
     const q = query(collection(db, 'videos'), where('type', '==', 'long-form'));
@@ -97,7 +107,7 @@ export function ProjectGrid() {
       const vids = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       vids.sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
       setVideos(vids);
-    });
+    }, (error) => console.error("Error fetching project grid videos:", error));
     return unsub;
   }, []);
 
@@ -114,9 +124,9 @@ export function ProjectGrid() {
               Hover over a project to watch an instant preview.
             </p>
           </div>
-          <button className="text-white border-b-2 border-white/20 pb-1 font-medium hover:border-white transition-colors uppercase tracking-wider text-sm flex-shrink-0 self-start md:self-auto uppercase">
+          <a href={youtubeLink} target="_blank" rel="noopener noreferrer" className="text-white border-b-2 border-white/20 pb-1 font-medium hover:border-white transition-colors tracking-wider text-sm flex-shrink-0 self-start md:self-auto uppercase">
             View All Projects
-          </button>
+          </a>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">

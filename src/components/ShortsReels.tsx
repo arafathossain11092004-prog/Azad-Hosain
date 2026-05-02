@@ -74,7 +74,7 @@ export function ShortsReels() {
       const vids = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       vids.sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
       setVideos(vids);
-    });
+    }, (error) => console.error("Error fetching shortsreels:", error));
     return unsub;
   }, []);
 

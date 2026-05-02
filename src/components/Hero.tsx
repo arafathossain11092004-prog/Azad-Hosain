@@ -22,7 +22,7 @@ export function Hero() {
         if (data.heroSubtitle) setHeroSubtitle(data.heroSubtitle);
         if (data.heroDescription) setHeroDescription(data.heroDescription);
       }
-    });
+    }, (error) => console.error("Error fetching config in Hero:", error));
   }, []);
 
   const titleWords = heroTitle.trim().split(' ');

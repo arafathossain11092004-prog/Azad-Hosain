@@ -4,28 +4,28 @@ import { db } from '../utils/firebase';
 
 export function AdminConfig() {
   const [videoCvUrl, setVideoCvUrl] = useState('');
-  const [logoUrl, setLogoUrl] = useState('/logo.png');
   const [heroTitle, setHeroTitle] = useState('Azad Hossain');
   const [heroSubtitle, setHeroSubtitle] = useState('Video Editor & Motion Designer');
   const [heroDescription, setHeroDescription] = useState('I craft high-retention, aesthetically driven visual experiences. Transforming simple footage into cinematic motion design that demands attention.');
+  const [youtubeLink, setYoutubeLink] = useState('https://youtube.com');
 
   useEffect(() => {
     return onSnapshot(doc(db, 'config', 'main'), (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
         if (data.videoCvUrl) setVideoCvUrl(data.videoCvUrl);
-        if (data.logoUrl) setLogoUrl(data.logoUrl);
         if (data.heroTitle) setHeroTitle(data.heroTitle);
         if (data.heroSubtitle) setHeroSubtitle(data.heroSubtitle);
         if (data.heroDescription) setHeroDescription(data.heroDescription);
+        if (data.youtubeLink) setYoutubeLink(data.youtubeLink);
       }
-    });
+    }, (error) => console.error("Error fetching admin config:", error));
   }, []);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await setDoc(doc(db, 'config', 'main'), { videoCvUrl, logoUrl, heroTitle, heroSubtitle, heroDescription });
+      await setDoc(doc(db, 'config', 'main'), { videoCvUrl, heroTitle, heroSubtitle, heroDescription, youtubeLink });
       alert('Config updated successfully!');
     } catch (err: any) {
       alert(`Error updating config: ${err.message}`);
@@ -75,6 +75,17 @@ export function AdminConfig() {
             value={heroDescription} 
             onChange={e=>setHeroDescription(e.target.value)} 
             className="w-full bg-black border border-neutral-800 rounded-lg px-3 py-2 text-white focus:border-[#F26B22] resize-none" 
+          />
+        </div>
+
+        <div>
+          <label className="block text-neutral-400 text-sm mb-2">YouTube Channel URL (For 'View All Projects')</label>
+          <input 
+            required 
+            type="url"
+            value={youtubeLink} 
+            onChange={e=>setYoutubeLink(e.target.value)} 
+            className="w-full bg-black border border-neutral-800 rounded-lg px-3 py-2 text-white focus:border-[#F26B22]" 
           />
         </div>
         

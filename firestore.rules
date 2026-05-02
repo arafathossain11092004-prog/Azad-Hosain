@@ -76,7 +76,8 @@ service cloud.firestore {
         && data.get('logoUrl', '') is string
         && data.get('heroTitle', '') is string
         && data.get('heroSubtitle', '') is string
-        && data.get('heroDescription', '') is string;
+        && data.get('heroDescription', '') is string
+        && data.get('youtubeLink', '') is string;
     }
 
     // Default deny

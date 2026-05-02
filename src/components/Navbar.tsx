@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, Play } from 'lucide-react';
-import { doc, onSnapshot } from 'firebase/firestore';
-import { db } from '../utils/firebase';
 
 const NAV_LINKS = [
   { name: 'Portfolio', href: '#portfolio' },
