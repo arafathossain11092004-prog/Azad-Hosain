@@ -140,13 +140,7 @@ export default function Admin() {
     e.preventDefault();
     if (!profile) return;
     try {
-      await updateDoc(doc(db, 'profile', 'main'), profile).catch(async (error) => {
-        if (error.code === 'not-found') {
-          await setDoc(doc(db, 'profile', 'main'), profile);
-        } else {
-          throw error;
-        }
-      });
+      await setDoc(doc(db, 'profile', 'main'), profile, { merge: true });
       alert('Profile updated');
     } catch (err: any) {
       alert('Error updating profile: ' + err.message);

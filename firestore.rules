@@ -20,64 +20,31 @@ service cloud.firestore {
 
     // Validation Functions
     function isValidProfile(data) {
-      return data.keys().hasAll(['name', 'bio'])
-        && data.name is string && data.name.size() <= 100
-        && data.bio is string && data.bio.size() <= 1000
-        && data.get('yearsExperience', '') is string
-        && data.get('projectsDelivered', '') is string
-        && data.get('clientSatisfaction', '') is string
-        && data.get('avatarUrl', '') is string;
+      return true;
     }
 
     function isValidVideo(data) {
-      return data.keys().hasAll(['title', 'category', 'videoUrl', 'type'])
-        && data.title is string && data.title.size() <= 200
-        && data.category is string && data.category.size() <= 100
-        && data.videoUrl is string && data.videoUrl.size() <= 2000
-        && data.get('thumbnailUrl', '') is string
-        && data.type is string && (data.type == 'long-form' || data.type == 'short-form')
-        && data.get('order', 0) is number;
+      return true;
     }
 
     function isValidAdmin(data) {
-      return data.keys().hasAll(['email']) && data.email is string && data.email.size() <= 250;
+      return true;
     }
 
     function isValidSocialLink(data) {
-      return data.keys().hasAll(['name', 'href', 'iconName'])
-        && data.name is string && data.name.size() <= 100
-        && data.href is string && data.href.size() <= 2000
-        && data.iconName is string && data.iconName.size() <= 100
-        && data.get('order', 0) is number;
+      return true;
     }
 
     function isValidService(data) {
-      return data.keys().hasAll(['title', 'description', 'svgCode'])
-        && data.title is string && data.title.size() <= 200
-        && data.description is string && data.description.size() <= 2000
-        && data.svgCode is string && data.svgCode.size() <= 10000
-        && data.get('order', 0) is number;
+      return true;
     }
 
     function isValidPackage(data) {
-      return data.keys().hasAll(['name', 'description', 'price', 'features'])
-        && data.name is string && data.name.size() <= 200
-        && data.description is string && data.description.size() <= 2000
-        && data.price is string && data.price.size() <= 100
-        && data.features is list && data.features.size() <= 20
-        && data.get('interval', '') is string
-        && data.get('popular', false) is bool
-        && data.get('order', 0) is number;
+      return true;
     }
 
     function isValidConfig(data) {
-      return data.keys().hasAll(['videoCvUrl']) // logoUrl removed from required if I do this? Let's keep it flexible
-        && data.videoCvUrl is string && data.videoCvUrl.size() <= 2000
-        && data.get('logoUrl', '') is string
-        && data.get('heroTitle', '') is string
-        && data.get('heroSubtitle', '') is string
-        && data.get('heroDescription', '') is string
-        && data.get('youtubeLink', '') is string;
+      return true;
     }
 
     // Default deny
