@@ -23,7 +23,6 @@ const getYouTubeId = (url: string) => {
 };
 
 function VideoCard({ project, index }: VideoCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   
@@ -34,18 +33,14 @@ function VideoCard({ project, index }: VideoCardProps) {
 
   useEffect(() => {
     if (videoRef.current && !youtubeId) {
-      if (isHovered) {
-        const playPromise = videoRef.current.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(error => console.log("Auto-play prevented", error));
-        }
-      } else {
-        videoRef.current.pause();
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => console.log("Auto-play prevented", error));
       }
     }
-  }, [isHovered, youtubeId]);
+  }, [youtubeId]);
 
-  const thumbnailUrl = project.thumbnailUrl || project.thumbnail || (youtubeId ? `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg` : '');
+  const thumbnailUrl = project.thumbnailUrl || project.thumbnail;
 
   return (
     <motion.div
@@ -54,33 +49,31 @@ function VideoCard({ project, index }: VideoCardProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.6, delay: index * 0.1, ease: 'easeOut' }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       className="group relative rounded-xl overflow-hidden aspect-video bg-neutral-900 cursor-pointer"
     >
       {/* Thumbnail */}
-      <img
-        src={thumbnailUrl}
-        alt={project.title}
-        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 scale-105 group-hover:scale-100 ${
-          isHovered && isVideoLoaded ? 'opacity-0' : 'opacity-100'
-        }`}
-        loading="lazy"
-        onError={(e) => {
-          if (youtubeId && e.currentTarget.src.includes('maxresdefault')) {
-            e.currentTarget.src = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
-          }
-        }}
-      />
+      {thumbnailUrl && (
+        <img
+          src={thumbnailUrl}
+          alt={project.title}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 scale-105 group-hover:scale-100 ${
+            isVideoLoaded ? 'opacity-0' : 'opacity-100'
+          }`}
+          loading="lazy"
+          onError={(e) => {
+            if (youtubeId && e.currentTarget.src.includes('maxresdefault')) {
+              e.currentTarget.src = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
+            }
+          }}
+        />
+      )}
 
       {/* Video / YouTube Iframe */}
       {isInView && (
         youtubeId ? (
           <iframe
-            src={`https://www.youtube.com/embed/${youtubeId}?autoplay=${isHovered ? 1 : 0}&mute=1&controls=0&loop=1&playlist=${youtubeId}&modestbranding=1&playsinline=1`}
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 pointer-events-none scale-105 ${
-              isHovered ? 'opacity-100' : 'opacity-0'
-            }`}
+            src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${youtubeId}&modestbranding=1&playsinline=1`}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 pointer-events-none scale-105 opacity-100`}
             allow="autoplay; encrypted-media"
             frameBorder="0"
             onLoad={() => setIsVideoLoaded(true)}
@@ -92,11 +85,10 @@ function VideoCard({ project, index }: VideoCardProps) {
             muted
             loop
             playsInline
+            autoPlay
             preload="metadata"
             onCanPlay={() => setIsVideoLoaded(true)}
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
-              isHovered ? 'opacity-100' : 'opacity-0'
-            }`}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 opacity-100`}
           />
         )
       )}

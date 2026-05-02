@@ -40,7 +40,6 @@ export default function Admin() {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
-  const [thumbnailUrl, setThumbnailUrl] = useState('');
   const [type, setType] = useState('short-form');
   const [order, setOrder] = useState(0);
 
@@ -136,11 +135,10 @@ export default function Admin() {
         title,
         category,
         videoUrl,
-        thumbnailUrl: thumbnailUrl || 'https://images.unsplash.com/photo-1542204165-65bf26472b9b?auto=format&fit=crop&q=80&w=1000',
         type,
         order: Number(order),
       });
-      setTitle(''); setCategory(''); setVideoUrl(''); setThumbnailUrl(''); setOrder(0);
+      setTitle(''); setCategory(''); setVideoUrl(''); setOrder(0);
       setVideoStatus({ type: 'success', msg: 'Video added successfully!' });
       setTimeout(() => setVideoStatus(null), 3000);
     } catch (err: any) {
@@ -350,8 +348,12 @@ export default function Admin() {
                     <div className="grid sm:grid-cols-2 gap-4">
                       {videos.map(vid => (
                         <div key={vid.id} className="bg-black border border-neutral-800 rounded-xl overflow-hidden group">
-                          <div className="aspect-video relative">
-                            <img src={vid.thumbnailUrl || vid.thumbnail} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-300" />
+                          <div className="aspect-video relative bg-neutral-900 flex items-center justify-center">
+                            {vid.type === 'short-form' ? (
+                              <svg className="w-12 h-12 text-neutral-600" fill="currentColor" viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4zM14 13h-3v3H9v-3H6v-2h3V8h2v3h3v2z"/></svg>
+                            ) : (
+                              <svg className="w-12 h-12 text-neutral-600" fill="currentColor" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-3v6H5V7h2v6l5-3 5 3v-6h2v6l-5 3z"/></svg> // just some dummy icon indicating video
+                            )}
                             <div className="absolute top-2 right-2 bg-black/80 px-2 py-1 rounded text-xs font-bold uppercase backdrop-blur-sm">
                               {vid.type === 'short-form' ? '9:16' : '16:9'}
                             </div>
@@ -380,12 +382,8 @@ export default function Admin() {
                       <input required value={category} onChange={e => setCategory(e.target.value)} className="w-full bg-black border border-neutral-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-[#F26B22]" />
                     </div>
                     <div>
-                      <label className="block text-sm text-neutral-400 mb-1">Video URL (MP4/Vimeo)</label>
+                      <label className="block text-sm text-neutral-400 mb-1">Video URL (MP4/Vimeo/YouTube)</label>
                       <input required type="url" value={videoUrl} onChange={e => setVideoUrl(e.target.value)} className="w-full bg-black border border-neutral-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-[#F26B22]" />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-neutral-400 mb-1">Thumbnail URL</label>
-                      <input type="url" value={thumbnailUrl} onChange={e => setThumbnailUrl(e.target.value)} className="w-full bg-black border border-neutral-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-[#F26B22]" />
                     </div>
                     <div>
                       <label className="block text-sm text-neutral-400 mb-1">Format Type</label>

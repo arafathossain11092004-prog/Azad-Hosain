@@ -10,7 +10,6 @@ const getYouTubeId = (url: string) => {
 };
 
 function ShortVideoCard({ project, index }: { project: any; index: number }) {
-  const [isHovered, setIsHovered] = useState(false);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   
@@ -21,47 +20,41 @@ function ShortVideoCard({ project, index }: { project: any; index: number }) {
 
   useEffect(() => {
     if (videoRef.current && !youtubeId) {
-      if (isHovered) {
-        const playPromise = videoRef.current.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(error => console.log("Auto-play prevented", error));
-        }
-      } else {
-        videoRef.current.pause();
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => console.log("Auto-play prevented", error));
       }
     }
-  }, [isHovered, youtubeId]);
+  }, [youtubeId]);
 
-  const thumbnailUrl = project.thumbnailUrl || project.thumbnail || (youtubeId ? `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg` : '');
+  const thumbnailUrl = project.thumbnailUrl || project.thumbnail;
 
   return (
     <div
       ref={containerRef}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       className="group relative rounded-2xl overflow-hidden aspect-[9/16] bg-neutral-900 cursor-pointer shadow-2xl"
     >
-      <img
-        src={thumbnailUrl}
-        alt={project.title}
-        className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ${
-          isHovered && isVideoLoaded ? 'opacity-0' : 'opacity-100'
-        }`}
-        loading="lazy"
-        onError={(e) => {
-          if (youtubeId && e.currentTarget.src.includes('maxresdefault')) {
-            e.currentTarget.src = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
-          }
-        }}
-      />
+      {thumbnailUrl && (
+        <img
+          src={thumbnailUrl}
+          alt={project.title}
+          className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ${
+            isVideoLoaded ? 'opacity-0' : 'opacity-100'
+          }`}
+          loading="lazy"
+          onError={(e) => {
+            if (youtubeId && e.currentTarget.src.includes('maxresdefault')) {
+              e.currentTarget.src = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
+            }
+          }}
+        />
+      )}
 
       {isInView && (
         youtubeId ? (
           <iframe
-            src={`https://www.youtube.com/embed/${youtubeId}?autoplay=${isHovered ? 1 : 0}&mute=1&controls=0&loop=1&playlist=${youtubeId}&modestbranding=1&playsinline=1`}
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 pointer-events-none scale-105 ${
-              isHovered ? 'opacity-100' : 'opacity-0'
-            }`}
+            src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${youtubeId}&modestbranding=1&playsinline=1`}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 pointer-events-none scale-105 opacity-100`}
             allow="autoplay; encrypted-media"
             frameBorder="0"
             onLoad={() => setIsVideoLoaded(true)}
@@ -73,11 +66,10 @@ function ShortVideoCard({ project, index }: { project: any; index: number }) {
             muted
             loop
             playsInline
+            autoPlay
             preload="metadata"
             onCanPlay={() => setIsVideoLoaded(true)}
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
-              isHovered ? 'opacity-100' : 'opacity-0'
-            }`}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100`}
           />
         )
       )}
