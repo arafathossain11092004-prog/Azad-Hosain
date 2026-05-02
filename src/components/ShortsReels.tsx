@@ -134,19 +134,31 @@ export function ShortsReels() {
         </div>
       </div>
 
-      {/* Marquee Container */}
+      {/* Scrollable / Marquee Container */}
       <div 
-        className="relative w-full flex align-center overflow-hidden pb-12"
-        style={{ maskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)' }}
+        className="relative w-full overflow-hidden pb-12 flex"
+        style={{ maskImage: 'linear-gradient(to right, transparent, black 2%, black 98%, transparent)' }}
       >
         <motion.div
-          className="flex gap-4 md:gap-8 min-w-max px-4"
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{ repeat: Infinity, ease: "linear", duration: 30 }}
+          className="flex gap-4 md:gap-8 px-2 md:px-4 min-w-full"
+          animate={{ x: ["0%", "-100%"] }}
+          transition={{ repeat: Infinity, ease: "linear", duration: Math.max(videos.length * 5, 20) }}
         >
-          {/* Duplicate the videos twice to create a seamless infinite loop */}
-          {[...videos, ...videos].map((project, index) => (
-            <div key={`${project.id}-${index}`} className="w-[60vw] sm:w-[40vw] md:w-[25vw] lg:w-[20vw] flex-shrink-0">
+          {videos.map((project, index) => (
+            <div key={project.id} className="w-[70vw] sm:w-[40vw] md:w-[25vw] lg:w-[22vw] flex-shrink-0">
+              <ShortVideoCard project={project} index={index} />
+            </div>
+          ))}
+        </motion.div>
+        
+        {/* Duplicate block for seamless infinite scrolling */}
+        <motion.div
+          className="flex gap-4 md:gap-8 px-2 md:px-4 min-w-full absolute left-full top-0"
+          animate={{ x: ["0%", "-100%"] }}
+          transition={{ repeat: Infinity, ease: "linear", duration: Math.max(videos.length * 5, 20) }}
+        >
+          {videos.map((project, index) => (
+            <div key={`${project.id}-dup`} className="w-[70vw] sm:w-[40vw] md:w-[25vw] lg:w-[22vw] flex-shrink-0">
               <ShortVideoCard project={project} index={index} />
             </div>
           ))}
