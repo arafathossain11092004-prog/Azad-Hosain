@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
-import { db } from '../utils/firebase';
+import { db, auth } from '../utils/firebase';
 
 export function AdminConfig() {
   const [videoCvUrl, setVideoCvUrl] = useState('');
@@ -25,10 +25,21 @@ export function AdminConfig() {
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Best Practice: Verify user is authenticated before attempting an update
+      if (!auth.currentUser) {
+        alert("Authentication Error: You must be logged in to update the configuration.");
+        return;
+      }
+
       await setDoc(doc(db, 'config', 'main'), { videoCvUrl, heroTitle, heroSubtitle, heroDescription, youtubeLink }, { merge: true });
       alert('Config updated successfully!');
     } catch (err: any) {
-      alert(`Error updating config: ${err.message}`);
+      console.error("Firestore Update Error:", err);
+      if (err.code === 'permission-denied') {
+        alert(`Error: Missing or insufficient permissions. Verify that your account (${auth.currentUser?.email}) has admin access in Firestore rules.`);
+      } else {
+        alert(`Error updating config: ${err.message}`);
+      }
     }
   };
 
