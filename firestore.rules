@@ -1,0 +1,148 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper Functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) || 
+        request.auth.token.email == "helloimarafat@gmail.com"
+      );
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    // Validation Functions
+    function isValidProfile(data) {
+      return data.keys().hasAll(['name', 'bio'])
+        && data.name is string && data.name.size() <= 100
+        && data.bio is string && data.bio.size() <= 1000
+        && data.get('yearsExperience', '') is string
+        && data.get('projectsDelivered', '') is string
+        && data.get('clientSatisfaction', '') is string
+        && data.get('avatarUrl', '') is string;
+    }
+
+    function isValidVideo(data) {
+      return data.keys().hasAll(['title', 'category', 'videoUrl', 'type'])
+        && data.title is string && data.title.size() <= 200
+        && data.category is string && data.category.size() <= 100
+        && data.videoUrl is string && data.videoUrl.size() <= 2000
+        && data.get('thumbnailUrl', '') is string
+        && data.type is string && (data.type == 'long-form' || data.type == 'short-form')
+        && data.get('order', 0) is number;
+    }
+
+    function isValidAdmin(data) {
+      return data.keys().hasAll(['email']) && data.email is string && data.email.size() <= 250;
+    }
+
+    function isValidSocialLink(data) {
+      return data.keys().hasAll(['name', 'href', 'iconName'])
+        && data.name is string && data.name.size() <= 100
+        && data.href is string && data.href.size() <= 2000
+        && data.iconName is string && data.iconName.size() <= 100
+        && data.get('order', 0) is number;
+    }
+
+    function isValidService(data) {
+      return data.keys().hasAll(['title', 'description', 'svgCode'])
+        && data.title is string && data.title.size() <= 200
+        && data.description is string && data.description.size() <= 2000
+        && data.svgCode is string && data.svgCode.size() <= 10000
+        && data.get('order', 0) is number;
+    }
+
+    function isValidPackage(data) {
+      return data.keys().hasAll(['name', 'description', 'price', 'features'])
+        && data.name is string && data.name.size() <= 200
+        && data.description is string && data.description.size() <= 2000
+        && data.price is string && data.price.size() <= 100
+        && data.features is list && data.features.size() <= 20
+        && data.get('interval', '') is string
+        && data.get('popular', false) is bool
+        && data.get('order', 0) is number;
+    }
+
+    function isValidConfig(data) {
+      return data.keys().hasAll(['videoCvUrl']) // logoUrl removed from required if I do this? Let's keep it flexible
+        && data.videoCvUrl is string && data.videoCvUrl.size() <= 2000
+        && data.get('logoUrl', '') is string
+        && data.get('heroTitle', '') is string
+        && data.get('heroSubtitle', '') is string
+        && data.get('heroDescription', '') is string;
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Config Document
+    match /config/{documentId} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if isAdmin() && isValidConfig(incoming());
+      allow update: if isAdmin() && isValidConfig(incoming());
+      allow delete: if isAdmin();
+    }
+
+    // Admins Collection
+    match /admins/{userId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin() && isValidAdmin(incoming());
+      allow update: if false; // email shouldn't change
+      allow delete: if isAdmin();
+    }
+
+    // Profile Document
+    match /profile/{documentId} {
+      // Anyone can read profile
+      allow get: if true;
+      allow list: if false; // Profile should just be accessed directly by ID
+      
+      // Only admins can write
+      allow create: if isAdmin() && isValidProfile(incoming());
+      allow update: if isAdmin() && isValidProfile(incoming());
+      allow delete: if isAdmin();
+    }
+
+    // Videos Collection
+    match /videos/{videoId} {
+      // Anyone can see videos
+      allow read: if true;
+      
+      // Only admins can write
+      allow create: if isAdmin() && isValidVideo(incoming());
+      allow update: if isAdmin() && isValidVideo(incoming());
+      allow delete: if isAdmin();
+    }
+
+    match /socialLinks/{linkId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidSocialLink(incoming());
+      allow update: if isAdmin() && isValidSocialLink(incoming());
+      allow delete: if isAdmin();
+    }
+
+    match /services/{serviceId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidService(incoming());
+      allow update: if isAdmin() && isValidService(incoming());
+      allow delete: if isAdmin();
+    }
+
+    match /packages/{packageId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidPackage(incoming());
+      allow update: if isAdmin() && isValidPackage(incoming());
+      allow delete: if isAdmin();
+    }
+  }
+}

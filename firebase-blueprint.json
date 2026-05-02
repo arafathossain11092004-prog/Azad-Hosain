@@ -1,0 +1,121 @@
+{
+  "entities": {
+    "Profile": {
+      "title": "Profile",
+      "description": "Global website profile information",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "bio": { "type": "string" },
+        "yearsExperience": { "type": "string" },
+        "projectsDelivered": { "type": "string" },
+        "clientSatisfaction": { "type": "string" },
+        "avatarUrl": { "type": "string" }
+      },
+      "required": ["name", "bio"]
+    },
+    "Video": {
+      "title": "Video",
+      "description": "A video project",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "videoUrl": { "type": "string" },
+        "thumbnailUrl": { "type": "string" },
+        "type": { "type": "string", "enum": ["long-form", "short-form"] },
+        "order": { "type": "number" }
+      },
+      "required": ["title", "category", "videoUrl", "type"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "Admin user reference",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "username": { "type": "string" }
+      },
+      "required": ["email"]
+    },
+    "SocialLink": {
+      "title": "Social Link",
+      "description": "A social media link for contact",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "href": { "type": "string" },
+        "iconName": { "type": "string" },
+        "order": { "type": "number" }
+      },
+      "required": ["name", "href", "iconName"]
+    },
+    "Service": {
+      "title": "Service",
+      "description": "A service offered",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "svgCode": { "type": "string" },
+        "order": { "type": "number" }
+      },
+      "required": ["title", "description", "svgCode"]
+    },
+    "PricingPackage": {
+      "title": "Pricing Package",
+      "description": "A pricing tier",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "price": { "type": "string" },
+        "interval": { "type": "string" },
+        "features": { "type": "array" },
+        "popular": { "type": "boolean" },
+        "order": { "type": "number" }
+      },
+      "required": ["name", "description", "price", "features"]
+    },
+    "SiteConfig": {
+      "title": "Site Config",
+      "description": "Global website configuration",
+      "type": "object",
+      "properties": {
+        "videoCvUrl": { "type": "string" },
+        "logoUrl": { "type": "string" }
+      },
+      "required": ["videoCvUrl", "logoUrl"]
+    }
+  },
+  "firestore": {
+    "config/{documentId}": {
+      "schema": { "$ref": "#/entities/SiteConfig" },
+      "description": "Global config like Video CV"
+    },
+    "profile/{documentId}": {
+      "schema": { "$ref": "#/entities/Profile" },
+      "description": "Singleton profile document, usually 'main'"
+    },
+    "videos/{videoId}": {
+      "schema": { "$ref": "#/entities/Video" },
+      "description": "List of videos"
+    },
+    "admins/{userId}": {
+      "schema": { "$ref": "#/entities/Admin" },
+      "description": "List of admin users"
+    },
+    "socialLinks/{linkId}": {
+      "schema": { "$ref": "#/entities/SocialLink" },
+      "description": "List of social links"
+    },
+    "services/{serviceId}": {
+      "schema": { "$ref": "#/entities/Service" },
+      "description": "List of services"
+    },
+    "packages/{packageId}": {
+      "schema": { "$ref": "#/entities/PricingPackage" },
+      "description": "List of pricing packages"
+    }
+  }
+}
