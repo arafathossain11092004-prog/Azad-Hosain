@@ -216,6 +216,10 @@ export default function Admin() {
               Sign In
             </button>
           </form>
+          
+          <p className="mt-6 text-xs text-neutral-500 text-center">
+            Note: Ensure "Email/Password" Authentication provider is enabled in your Firebase Console under Build &gt; Authentication &gt; Sign-in method.
+          </p>
         </div>
       </div>
     );
