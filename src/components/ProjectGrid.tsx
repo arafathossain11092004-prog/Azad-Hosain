@@ -16,25 +16,36 @@ interface VideoCardProps {
   index: number;
 }
 
+const getYouTubeId = (url: string) => {
+  if (!url) return null;
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/);
+  return match ? match[1] : null;
+};
+
 function VideoCard({ project, index }: VideoCardProps) {
+  const [isHovered, setIsHovered] = useState(false);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   
-  // Lazy-loading video approach: Only attach video src when card is somewhat near view
   const containerRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(containerRef, { once: true, margin: "200px" });
 
+  const youtubeId = getYouTubeId(project.videoUrl);
+
   useEffect(() => {
-    if (isInView && videoRef.current) {
-      // Ensure we treat the promise correctly to avoid unhandled rejections
-      const playPromise = videoRef.current.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(error => {
-          console.log("Auto-play was prevented or interrupted", error);
-        });
+    if (videoRef.current && !youtubeId) {
+      if (isHovered) {
+        const playPromise = videoRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(error => console.log("Auto-play prevented", error));
+        }
+      } else {
+        videoRef.current.pause();
       }
     }
-  }, [isInView]);
+  }, [isHovered, youtubeId]);
+
+  const thumbnailUrl = project.thumbnailUrl || project.thumbnail || (youtubeId ? `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg` : '');
 
   return (
     <motion.div
@@ -43,33 +54,51 @@ function VideoCard({ project, index }: VideoCardProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.6, delay: index * 0.1, ease: 'easeOut' }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className="group relative rounded-xl overflow-hidden aspect-video bg-neutral-900 cursor-pointer"
     >
       {/* Thumbnail */}
       <img
-        src={project.thumbnailUrl || project.thumbnail}
+        src={thumbnailUrl}
         alt={project.title}
         className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 scale-105 group-hover:scale-100 ${
-          isVideoLoaded ? 'opacity-0' : 'opacity-100'
+          isHovered && isVideoLoaded ? 'opacity-0' : 'opacity-100'
         }`}
         loading="lazy"
+        onError={(e) => {
+          if (youtubeId && e.currentTarget.src.includes('maxresdefault')) {
+            e.currentTarget.src = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
+          }
+        }}
       />
 
-      {/* Video Preview (lazy loaded) */}
+      {/* Video / YouTube Iframe */}
       {isInView && (
-        <video
-          ref={videoRef}
-          src={project.videoUrl}
-          muted
-          loop
-          playsInline
-          autoPlay
-          preload="none"
-          onCanPlay={() => setIsVideoLoaded(true)}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
-            isVideoLoaded ? 'opacity-100' : 'opacity-0'
-          }`}
-        />
+        youtubeId ? (
+          <iframe
+            src={`https://www.youtube.com/embed/${youtubeId}?autoplay=${isHovered ? 1 : 0}&mute=1&controls=0&loop=1&playlist=${youtubeId}&modestbranding=1&playsinline=1`}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 pointer-events-none scale-105 ${
+              isHovered ? 'opacity-100' : 'opacity-0'
+            }`}
+            allow="autoplay; encrypted-media"
+            frameBorder="0"
+            onLoad={() => setIsVideoLoaded(true)}
+          />
+        ) : (
+          <video
+            ref={videoRef}
+            src={project.videoUrl}
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            onCanPlay={() => setIsVideoLoaded(true)}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
+              isHovered ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
+        )
       )}
 
       {/* Overlay */}

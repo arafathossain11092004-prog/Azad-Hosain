@@ -55,8 +55,7 @@ service cloud.firestore {
 
     // Config Document
     match /config/{documentId} {
-      allow get: if true;
-      allow list: if false;
+      allow read: if true;
       allow create: if isAdmin() && isValidConfig(incoming());
       allow update: if isAdmin() && isValidConfig(incoming());
       allow delete: if isAdmin();
@@ -72,9 +71,7 @@ service cloud.firestore {
 
     // Profile Document
     match /profile/{documentId} {
-      // Anyone can read profile
-      allow get: if true;
-      allow list: if false; // Profile should just be accessed directly by ID
+      allow read: if true;
       
       // Only admins can write
       allow create: if isAdmin() && isValidProfile(incoming());

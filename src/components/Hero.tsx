@@ -33,7 +33,7 @@ export function Hero() {
   const firstWords = titleWords.join(' ');
 
   return (
-    <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-[100dvh] w-full flex items-center justify-center overflow-hidden">
       {/* Background Video Loop */}
       <div className="absolute inset-0 w-full h-full">
         <div className="absolute inset-0 bg-black/60 z-10" />
@@ -53,7 +53,7 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-neutral-800 bg-neutral-900/50 backdrop-blur-md mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-neutral-800 bg-neutral-900/50 backdrop-blur-md mb-6 md:mb-8 mt-16 md:mt-0">
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F26B22] opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#F26B22]"></span>
@@ -61,11 +61,11 @@ export function Hero() {
             <span className="text-xs font-semibold tracking-widest text-[#F26B22] uppercase">Available for work</span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight text-white mb-6 uppercase leading-[1.1]">
-            <span className="block text-neutral-500 font-light text-2xl md:text-3xl mb-4 tracking-normal normal-case">{heroSubtitle}</span>
-            {firstWords} {lastWord && <span className="text-[#F26B22]">{lastWord}</span>}
+          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tight text-white mb-6 uppercase leading-[1.1]">
+            <span className="block text-neutral-500 font-light text-xl sm:text-2xl md:text-3xl mb-4 tracking-normal normal-case">{heroSubtitle}</span>
+            <span className="break-words">{firstWords}</span> {lastWord && <span className="text-[#F26B22] break-words">{lastWord}</span>}
           </h1>
-          <p className="text-lg md:text-xl text-neutral-400 font-light mb-12 max-w-2xl mx-auto leading-relaxed whitespace-pre-wrap">
+          <p className="text-base sm:text-lg md:text-xl text-neutral-400 font-light mb-10 max-w-2xl mx-auto leading-relaxed whitespace-pre-wrap">
             {heroDescription}
           </p>
         </motion.div>
@@ -74,11 +74,11 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col sm:flex-row items-center gap-4"
+          className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto px-4"
         >
           <button
             onClick={() => setIsModalOpen(true)}
-            className="group relative flex items-center justify-center gap-3 bg-white text-black px-10 py-5 rounded-full font-bold text-lg overflow-hidden transition-transform hover:scale-105 active:scale-95 w-full sm:w-auto"
+            className="group relative flex items-center justify-center gap-3 bg-white text-black px-8 py-4 sm:px-10 sm:py-5 rounded-full font-bold text-base sm:text-lg overflow-hidden transition-transform hover:scale-105 active:scale-95 w-full sm:w-auto"
           >
             <div className="absolute inset-0 bg-neutral-100 opacity-0 group-hover:opacity-100 transition-opacity"></div>
             <Play fill="currentColor" className="w-5 h-5 relative z-10" />
@@ -87,7 +87,7 @@ export function Hero() {
           
           <a
             href="#contact"
-            className="group relative flex items-center justify-center gap-3 bg-transparent border border-white/20 text-white px-10 py-5 rounded-full font-bold text-lg overflow-hidden transition-all hover:bg-white/5 active:scale-95 w-full sm:w-auto"
+            className="group relative flex items-center justify-center gap-3 bg-transparent border border-white/20 text-white px-8 py-4 sm:px-10 sm:py-5 rounded-full font-bold text-base sm:text-lg overflow-hidden transition-all hover:bg-white/5 active:scale-95 w-full sm:w-auto"
           >
             <span className="relative z-10">Get In Touch</span>
           </a>

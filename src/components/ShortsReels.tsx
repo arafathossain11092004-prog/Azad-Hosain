@@ -3,57 +3,88 @@ import { motion, useInView } from 'motion/react';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '../utils/firebase';
 
+const getYouTubeId = (url: string) => {
+  if (!url) return null;
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/);
+  return match ? match[1] : null;
+};
+
 function ShortVideoCard({ project, index }: { project: any; index: number }) {
+  const [isHovered, setIsHovered] = useState(false);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   
   const containerRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(containerRef, { once: true, margin: "200px" });
 
+  const youtubeId = getYouTubeId(project.videoUrl);
+
   useEffect(() => {
-    if (isInView && videoRef.current) {
-      const playPromise = videoRef.current.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(error => {
-          console.log("Auto-play was prevented", error);
-        });
+    if (videoRef.current && !youtubeId) {
+      if (isHovered) {
+        const playPromise = videoRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(error => console.log("Auto-play prevented", error));
+        }
+      } else {
+        videoRef.current.pause();
       }
     }
-  }, [isInView]);
+  }, [isHovered, youtubeId]);
+
+  const thumbnailUrl = project.thumbnailUrl || project.thumbnail || (youtubeId ? `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg` : '');
 
   return (
     <div
       ref={containerRef}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className="group relative rounded-2xl overflow-hidden aspect-[9/16] bg-neutral-900 cursor-pointer shadow-2xl"
     >
       <img
-        src={project.thumbnailUrl || project.thumbnail}
+        src={thumbnailUrl}
         alt={project.title}
         className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ${
-          isVideoLoaded ? 'opacity-0' : 'opacity-100'
+          isHovered && isVideoLoaded ? 'opacity-0' : 'opacity-100'
         }`}
         loading="lazy"
+        onError={(e) => {
+          if (youtubeId && e.currentTarget.src.includes('maxresdefault')) {
+            e.currentTarget.src = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
+          }
+        }}
       />
 
       {isInView && (
-        <video
-          ref={videoRef}
-          src={project.videoUrl}
-          muted
-          loop
-          playsInline
-          autoPlay
-          preload="none"
-          onCanPlay={() => setIsVideoLoaded(true)}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
-            isVideoLoaded ? 'opacity-100' : 'opacity-0'
-          }`}
-        />
+        youtubeId ? (
+          <iframe
+            src={`https://www.youtube.com/embed/${youtubeId}?autoplay=${isHovered ? 1 : 0}&mute=1&controls=0&loop=1&playlist=${youtubeId}&modestbranding=1&playsinline=1`}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 pointer-events-none scale-105 ${
+              isHovered ? 'opacity-100' : 'opacity-0'
+            }`}
+            allow="autoplay; encrypted-media"
+            frameBorder="0"
+            onLoad={() => setIsVideoLoaded(true)}
+          />
+        ) : (
+          <video
+            ref={videoRef}
+            src={project.videoUrl}
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            onCanPlay={() => setIsVideoLoaded(true)}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
+              isHovered ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
+        )
       )}
 
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/90 opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
 
-      <div className="absolute inset-0 p-6 flex flex-col justify-end transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+      <div className="absolute inset-0 p-6 flex flex-col justify-end transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 pointer-events-none">
         <div className="bg-white text-black text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full inline-block mb-3 self-start">
           {project.category}
         </div>
