@@ -22,24 +22,33 @@ export function AdminConfig() {
     }, (error) => console.error("Error fetching admin config:", error));
   }, []);
 
+  const [status, setStatus] = useState<{type: 'success'|'error', msg: string}|null>(null);
+  const [saving, setSaving] = useState(false);
+
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
+    setStatus(null);
     try {
       // Best Practice: Verify user is authenticated before attempting an update
       if (!auth.currentUser) {
-        alert("Authentication Error: You must be logged in to update the configuration.");
+        setStatus({ type: 'error', msg: "Authentication Error: You must be logged in to update the configuration." });
+        setSaving(false);
         return;
       }
 
       await setDoc(doc(db, 'config', 'main'), { videoCvUrl, heroTitle, heroSubtitle, heroDescription, youtubeLink }, { merge: true });
-      alert('Config updated successfully!');
+      setStatus({ type: 'success', msg: 'Config updated successfully!' });
+      setTimeout(() => setStatus(null), 3000);
     } catch (err: any) {
       console.error("Firestore Update Error:", err);
       if (err.code === 'permission-denied') {
-        alert(`Error: Missing or insufficient permissions. Verify that your account (${auth.currentUser?.email}) has admin access in Firestore rules.`);
+        setStatus({ type: 'error', msg: `Error: Missing or insufficient permissions. Verify that your account (${auth.currentUser?.email}) has admin access in Firestore rules.` });
       } else {
-        alert(`Error updating config: ${err.message}`);
+        setStatus({ type: 'error', msg: `Error updating config: ${err.message}` });
       }
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -100,7 +109,14 @@ export function AdminConfig() {
           />
         </div>
         
-        <button type="submit" className="w-full bg-[#F26B22] text-white font-bold py-2 rounded-lg hover:bg-orange-600 transition-colors">Update Config</button>
+        {status && (
+          <div className={`text-sm p-3 rounded-lg ${status.type === 'success' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+            {status.msg}
+          </div>
+        )}
+        <button type="submit" disabled={saving} className="w-full bg-[#F26B22] hover:bg-orange-600 disabled:opacity-50 text-white font-bold py-2 rounded-lg transition-colors">
+          {saving ? 'Updating...' : 'Update Config'}
+        </button>
       </form>
     </div>
   );

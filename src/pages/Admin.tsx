@@ -124,8 +124,13 @@ export default function Admin() {
 
   const handleLogout = () => signOut(auth);
 
+  const [videoStatus, setVideoStatus] = useState<{type: 'success'|'error', msg: string}|null>(null);
+  const [videoSaving, setVideoSaving] = useState(false);
+
   const handleAddVideo = async (e: React.FormEvent) => {
     e.preventDefault();
+    setVideoSaving(true);
+    setVideoStatus(null);
     try {
       await addDoc(collection(db, 'videos'), {
         title,
@@ -136,9 +141,12 @@ export default function Admin() {
         order: Number(order),
       });
       setTitle(''); setCategory(''); setVideoUrl(''); setThumbnailUrl(''); setOrder(0);
-      alert('Video added');
+      setVideoStatus({ type: 'success', msg: 'Video added successfully!' });
+      setTimeout(() => setVideoStatus(null), 3000);
     } catch (err: any) {
-      alert('Error adding video: ' + err.message);
+      setVideoStatus({ type: 'error', msg: 'Error adding video: ' + err.message });
+    } finally {
+      setVideoSaving(false);
     }
   };
 
@@ -151,14 +159,22 @@ export default function Admin() {
     }
   };
 
+  const [profileStatus, setProfileStatus] = useState<{type: 'success'|'error', msg: string}|null>(null);
+  const [profileSaving, setProfileSaving] = useState(false);
+
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile) return;
+    setProfileSaving(true);
+    setProfileStatus(null);
     try {
       await setDoc(doc(db, 'profile', 'main'), profile, { merge: true });
-      alert('Profile updated');
+      setProfileStatus({ type: 'success', msg: 'Profile updated successfully!' });
+      setTimeout(() => setProfileStatus(null), 3000);
     } catch (err: any) {
-      alert('Error updating profile: ' + err.message);
+      setProfileStatus({ type: 'error', msg: 'Error updating: ' + err.message });
+    } finally {
+      setProfileSaving(false);
     }
   };
 
@@ -295,8 +311,13 @@ export default function Admin() {
                       <input required value={profile.clientSatisfaction} onChange={e => setProfile({...profile, clientSatisfaction: e.target.value})} className="w-full bg-black border border-neutral-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-[#F26B22]" />
                     </div>
                     <div className="pt-2">
-                      <button type="submit" className="w-full bg-[#F26B22] hover:bg-orange-600 text-white font-bold py-3 rounded-xl transition-colors">
-                        Save Profile
+                      {profileStatus && (
+                        <div className={`mb-3 text-sm p-3 rounded-lg ${profileStatus.type === 'success' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+                          {profileStatus.msg}
+                        </div>
+                      )}
+                      <button type="submit" disabled={profileSaving} className="w-full bg-[#F26B22] hover:bg-orange-600 disabled:opacity-50 text-white font-bold py-3 rounded-xl transition-colors">
+                        {profileSaving ? 'Saving...' : 'Save Profile'}
                       </button>
                     </div>
                   </div>
@@ -365,8 +386,13 @@ export default function Admin() {
                       <label className="block text-sm text-neutral-400 mb-1">Sort Order (Lower = First)</label>
                       <input type="number" value={order} onChange={e => setOrder(Number(e.target.value))} className="w-full bg-black border border-neutral-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-[#F26B22]" />
                     </div>
-                    <button type="submit" className="w-full bg-[#F26B22] hover:bg-orange-600 text-white font-bold py-3 rounded-xl mt-4 transition-colors">
-                      Save Video
+                    {videoStatus && (
+                      <div className={`text-sm p-3 rounded-lg mt-2 ${videoStatus.type === 'success' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+                        {videoStatus.msg}
+                      </div>
+                    )}
+                    <button type="submit" disabled={videoSaving} className="w-full bg-[#F26B22] hover:bg-orange-600 disabled:opacity-50 text-white font-bold py-3 rounded-xl mt-4 transition-colors">
+                      {videoSaving ? 'Saving...' : 'Save Video'}
                     </button>
                   </form>
                 </div>

@@ -11,7 +11,7 @@ import { Contact } from '../components/Contact';
 export default function Home() {
   return (
     <SmoothScroll>
-      <main className="bg-neutral-950 min-h-screen text-white font-sans selection:bg-red-500/30 selection:text-white">
+      <main className="bg-neutral-950 min-h-screen text-white font-sans selection:bg-red-500/30 selection:text-white overflow-x-hidden">
         <Navbar />
         <Hero />
         <ShortsReels />
