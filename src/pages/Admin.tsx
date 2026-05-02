@@ -168,11 +168,23 @@ export default function Admin() {
     setProfileSaving(true);
     setProfileStatus(null);
     try {
-      await setDoc(doc(db, 'profile', 'main'), profile, { merge: true });
+      if (!auth.currentUser) {
+        setProfileStatus({ type: 'error', msg: 'Authentication Error: You must be signed in to perform this update.' });
+        setProfileSaving(false);
+        return;
+      }
+      
+      const docRef = doc(db, 'profile', 'main');
+      await setDoc(docRef, profile, { merge: true });
       setProfileStatus({ type: 'success', msg: 'Profile updated successfully!' });
       setTimeout(() => setProfileStatus(null), 3000);
     } catch (err: any) {
-      setProfileStatus({ type: 'error', msg: 'Error updating: ' + err.message });
+      console.error("Error updating document:", err);
+      if (err.code === 'permission-denied') {
+        setProfileStatus({ type: 'error', msg: `Missing or insufficient permissions. Please check if your email (${auth.currentUser?.email}) has admin privileges.` });
+      } else {
+        setProfileStatus({ type: 'error', msg: 'Error updating: ' + err.message });
+      }
     } finally {
       setProfileSaving(false);
     }

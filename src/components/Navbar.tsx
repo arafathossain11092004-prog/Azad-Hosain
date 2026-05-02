@@ -97,11 +97,25 @@ export function Navbar() {
                       setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 100);
                     }
                   }}
-                  className="text-lg font-medium text-neutral-300 hover:text-white transition-colors uppercase tracking-wide"
+                  className="text-lg font-medium text-neutral-300 hover:text-white transition-colors uppercase tracking-wide border-b border-neutral-900 pb-2"
                 >
                   {link.name}
                 </a>
               ))}
+              <a
+                href="#contact"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsMobileMenuOpen(false);
+                  const el = document.querySelector('#contact');
+                  if (el) {
+                    setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 100);
+                  }
+                }}
+                className="inline-block mt-4 text-center px-5 py-3 bg-[#F26B22] text-white text-base font-bold uppercase tracking-wide rounded-lg hover:bg-orange-600 transition-colors"
+              >
+                Hire Me
+              </a>
             </div>
           </motion.div>
         )}
