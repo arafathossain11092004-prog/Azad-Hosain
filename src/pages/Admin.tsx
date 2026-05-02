@@ -63,11 +63,20 @@ export default function Admin() {
 
       const unsubProfile = onSnapshot(doc(db, 'profile', 'main'), (docSnap) => {
         if (docSnap.exists()) {
-          setProfile(docSnap.data());
+          setProfile((prev: any) => ({
+            name: 'Azad Hossain',
+            bio: "A passionate video editor and motion designer. I combine technical precision with creative storytelling to deliver visuals that don't just look good — they perform.",
+            yearsExperience: '4+',
+            projectsDelivered: '50+',
+            clientSatisfaction: '100%',
+            avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300&h=300',
+            ...prev,
+            ...docSnap.data() 
+          }));
         } else {
           setProfile({
-            name: 'Mostafa Hatem',
-            bio: "A passionate video editor and motion designer with over 4 years of experience crafting cinematic content for brands, creators, and agencies worldwide.",
+            name: 'Azad Hossain',
+            bio: "A passionate video editor and motion designer. I combine technical precision with creative storytelling to deliver visuals that don't just look good — they perform.",
             yearsExperience: '4+',
             projectsDelivered: '50+',
             clientSatisfaction: '100%',

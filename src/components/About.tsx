@@ -16,7 +16,7 @@ export function About() {
   useEffect(() => {
     const unsub = onSnapshot(doc(db, 'profile', 'main'), (docSnap) => {
       if (docSnap.exists()) {
-        setProfile(docSnap.data() as any);
+        setProfile(prev => ({ ...prev, ...(docSnap.data() as any) }));
       }
     }, (error) => console.error("Error fetching about profile:", error));
     return unsub;

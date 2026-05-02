@@ -18,7 +18,10 @@ export function Hero() {
       if (docSnap.exists()) {
         const data = docSnap.data();
         if (data.videoCvUrl) setVideoCvUrl(data.videoCvUrl);
-        if (data.heroTitle) setHeroTitle(data.heroTitle);
+        if (data.heroTitle) {
+          setHeroTitle(data.heroTitle);
+          document.title = `${data.heroTitle} - ${data.heroSubtitle || 'Portfolio'}`;
+        }
         if (data.heroSubtitle) setHeroSubtitle(data.heroSubtitle);
         if (data.heroDescription) setHeroDescription(data.heroDescription);
       }
