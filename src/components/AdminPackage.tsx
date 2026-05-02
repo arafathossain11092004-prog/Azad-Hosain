@@ -42,19 +42,27 @@ export function AdminPackage() {
     setFeatures(newFeatures);
   };
 
+  const [status, setStatus] = useState<{type: 'success'|'error', msg: string}|null>(null);
+  const [saving, setSaving] = useState(false);
+
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     const finalFeatures = features.filter(f => f.trim() !== '');
     if (finalFeatures.length === 0) {
-      alert('Please add at least one feature');
+      setStatus({ type: 'error', msg: 'Please add at least one feature' });
       return;
     }
+    setSaving(true);
+    setStatus(null);
     try {
       await addDoc(collection(db, 'packages'), { name, price, interval, description, features: finalFeatures, popular, order: Number(order) });
       setName(PACKAGE_NAMES[0]); setPrice(''); setInterval(''); setDescription(''); setFeatures(['']); setPopular(false); setOrder(order + 1);
-      alert('Package added successfully!');
+      setStatus({ type: 'success', msg: 'Package added successfully!' });
+      setTimeout(() => setStatus(null), 3000);
     } catch(err: any) {
-      alert(`Error adding package: ${err.message}`);
+      setStatus({ type: 'error', msg: `Error adding package: ${err.message}` });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -63,7 +71,7 @@ export function AdminPackage() {
       try {
         await deleteDoc(doc(db, 'packages', id));
       } catch(err: any) {
-        alert(err.message);
+        setStatus({ type: 'error', msg: err.message });
       }
     }
   };
@@ -134,7 +142,14 @@ export function AdminPackage() {
           <input type="number" placeholder="Sort Order" value={order} onChange={e=>setOrder(Number(e.target.value))} className="w-full bg-black border border-neutral-800 rounded-lg px-3 py-2 text-white focus:border-[#F26B22] focus:outline-none" />
         </div>
 
-        <button type="submit" className="w-full bg-[#F26B22] hover:bg-orange-600 text-white font-bold py-3 rounded-lg transition-colors">Add Package</button>
+        {status && (
+          <div className={`text-sm p-3 rounded-lg ${status.type === 'success' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+            {status.msg}
+          </div>
+        )}
+        <button type="submit" disabled={saving} className="w-full bg-[#F26B22] hover:bg-orange-600 disabled:opacity-50 text-white font-bold py-3 rounded-lg transition-colors">
+          {saving ? 'Adding...' : 'Add Package'}
+        </button>
       </form>
       <div className="space-y-2">
         {packages.map(pkg => (

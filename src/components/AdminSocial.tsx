@@ -38,10 +38,15 @@ export function AdminSocial() {
     }, (error) => console.error("Error fetching social links:", error));
   }, []);
 
+  const [status, setStatus] = useState<{type: 'success'|'error', msg: string}|null>(null);
+  const [saving, setSaving] = useState(false);
+
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!href.trim()) return;
 
+    setSaving(true);
+    setStatus(null);
     try {
       await addDoc(collection(db, 'socialLinks'), { 
         name: selectedSocial.name, 
@@ -50,9 +55,12 @@ export function AdminSocial() {
         order: Number(order) 
       });
       setHref(''); setOrder(links.length + 1);
-      alert('Social link added successfully!');
+      setStatus({ type: 'success', msg: 'Social link added successfully!' });
+      setTimeout(() => setStatus(null), 3000);
     } catch(err: any) {
-      alert(`Error adding link: ${err.message}`);
+      setStatus({ type: 'error', msg: `Error adding link: ${err.message}` });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -61,7 +69,7 @@ export function AdminSocial() {
       try {
         await deleteDoc(doc(db, 'socialLinks', id));
       } catch(err: any) {
-        alert(err.message);
+        setStatus({ type: 'error', msg: err.message });
       }
     }
   };
@@ -119,9 +127,14 @@ export function AdminSocial() {
           />
         </div>
         
-        <button type="submit" className="w-full flex items-center justify-center gap-2 bg-[#F26B22] hover:bg-orange-600 text-white font-bold py-3 rounded-lg transition-all active:scale-[0.98] shadow-lg shadow-[#F26B22]/20 mt-2">
+        {status && (
+          <div className={`text-sm p-3 rounded-lg ${status.type === 'success' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+            {status.msg}
+          </div>
+        )}
+        <button type="submit" disabled={saving} className="w-full flex items-center justify-center gap-2 bg-[#F26B22] hover:bg-orange-600 disabled:opacity-50 text-white font-bold py-3 rounded-lg transition-all active:scale-[0.98] shadow-lg shadow-[#F26B22]/20 mt-2">
           <Plus className="w-5 h-5" />
-          <span>Add Social Link</span>
+          <span>{saving ? 'Adding...' : 'Add Social Link'}</span>
         </button>
       </form>
 

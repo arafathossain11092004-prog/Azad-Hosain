@@ -17,14 +17,22 @@ export function AdminService() {
     }, (error) => console.error("Error fetching admin services:", error));
   }, []);
 
+  const [status, setStatus] = useState<{type: 'success'|'error', msg: string}|null>(null);
+  const [saving, setSaving] = useState(false);
+
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
+    setStatus(null);
     try {
       await addDoc(collection(db, 'services'), { title, svgCode, description, order: Number(order) });
       setTitle(''); setSvgCode(''); setDescription(''); setOrder(order + 1);
-      alert('Service added successfully!');
+      setStatus({ type: 'success', msg: 'Service added successfully!' });
+      setTimeout(() => setStatus(null), 3000);
     } catch (err: any) {
-      alert(`Error adding service: ${err.message}`);
+      setStatus({ type: 'error', msg: `Error adding service: ${err.message}` });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -33,7 +41,7 @@ export function AdminService() {
       try {
         await deleteDoc(doc(db, 'services', id));
       } catch(err: any) {
-        alert(err.message);
+        setStatus({ type: 'error', msg: err.message });
       }
     }
   };
@@ -46,7 +54,14 @@ export function AdminService() {
         <textarea required placeholder="SVG Code (<svg>...</svg>)" value={svgCode} onChange={e=>setSvgCode(e.target.value)} className="w-full bg-black border border-neutral-800 rounded-lg px-3 py-2 text-white focus:border-[#F26B22] focus:outline-none resize-none font-mono text-xs" rows={4} />
         <textarea required placeholder="Description" value={description} onChange={e=>setDescription(e.target.value)} className="w-full bg-black border border-neutral-800 rounded-lg px-3 py-2 text-white focus:border-[#F26B22] focus:outline-none resize-none" rows={3} />
         <input type="number" placeholder="Sort Order" value={order} onChange={e=>setOrder(Number(e.target.value))} className="w-full bg-black border border-neutral-800 rounded-lg px-3 py-2 text-white focus:border-[#F26B22] focus:outline-none" />
-        <button type="submit" className="w-full bg-[#F26B22] text-white font-bold py-2 rounded-lg hover:bg-orange-600 transition-colors">Add Service</button>
+        {status && (
+          <div className={`text-sm p-3 rounded-lg ${status.type === 'success' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+            {status.msg}
+          </div>
+        )}
+        <button type="submit" disabled={saving} className="w-full bg-[#F26B22] text-white font-bold py-2 rounded-lg hover:bg-orange-600 disabled:opacity-50 transition-colors">
+          {saving ? 'Adding...' : 'Add Service'}
+        </button>
       </form>
       <div className="space-y-2">
         {services.map(svc => (
