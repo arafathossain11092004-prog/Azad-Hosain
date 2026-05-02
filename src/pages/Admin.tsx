@@ -4,11 +4,11 @@ import { onAuthStateChanged, signOut, User, signInWithEmailAndPassword, updatePa
 import { collection, deleteDoc, doc, updateDoc, onSnapshot, addDoc, setDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import firebaseConfig from '../../firebase-applet-config.json';
 import { AdminService } from '../components/AdminService';
 import { AdminPackage } from '../components/AdminPackage';
 import { AdminSocial } from '../components/AdminSocial';
 import { AdminConfig } from '../components/AdminConfig';
+import firebaseConfig from '../../firebase-applet-config.json';
 
 const secondaryApp = initializeApp(firebaseConfig, "Secondary");
 const secondaryAuth = getAuth(secondaryApp);
@@ -108,8 +108,14 @@ export default function Admin() {
           const res = await createUserWithEmailAndPassword(auth, loginEmail, password);
           await setDoc(doc(db, 'admins', res.user.uid), { username: 'Azad', email: loginEmail });
           return;
-        } catch (bootstrapErr) {
+        } catch (bootstrapErr: any) {
           console.error('Bootstrap error:', bootstrapErr);
+          if (bootstrapErr.code === 'auth/configuration-not-found') {
+            alert('Firebase Error: Email/Password Authentication is not enabled in your Firebase Console. Please go to your Firebase project, open Authentication -> Sign-in method, and enable "Email/Password".');
+          } else {
+            alert('Login failed. ' + bootstrapErr.message);
+          }
+          return;
         }
       }
       alert('Login failed. Please check your credentials.');
