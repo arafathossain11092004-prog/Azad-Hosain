@@ -42,6 +42,11 @@ export function Navbar() {
             <a
               key={link.name}
               href={link.href}
+              onClick={(e) => {
+                e.preventDefault();
+                const el = document.querySelector(link.href);
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
               className="text-sm font-medium text-neutral-300 hover:text-white transition-colors tracking-wide uppercase"
             >
               {link.name}
@@ -49,6 +54,11 @@ export function Navbar() {
           ))}
           <a
             href="#contact"
+            onClick={(e) => {
+              e.preventDefault();
+              const el = document.querySelector('#contact');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
             className="px-5 py-2.5 bg-white text-black text-sm font-bold uppercase tracking-wide rounded-full hover:bg-neutral-200 transition-colors"
           >
             Hire Me
@@ -79,7 +89,14 @@ export function Navbar() {
                 <a
                   key={link.name}
                   href={link.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsMobileMenuOpen(false);
+                    const el = document.querySelector(link.href);
+                    if (el) {
+                      setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 100);
+                    }
+                  }}
                   className="text-lg font-medium text-neutral-300 hover:text-white transition-colors uppercase tracking-wide"
                 >
                   {link.name}
