@@ -145,7 +145,7 @@ export function ShortsReels() {
           transition={{ repeat: Infinity, ease: "linear", duration: Math.max(videos.length * 5, 20) }}
         >
           {videos.map((project, index) => (
-            <div key={project.id} className="w-[70vw] sm:w-[40vw] md:w-[25vw] lg:w-[22vw] flex-shrink-0">
+            <div key={project.id} className="w-[60vw] sm:w-[35vw] md:w-[20vw] lg:w-[16vw] flex-shrink-0">
               <ShortVideoCard project={project} index={index} />
             </div>
           ))}
@@ -158,7 +158,7 @@ export function ShortsReels() {
           transition={{ repeat: Infinity, ease: "linear", duration: Math.max(videos.length * 5, 20) }}
         >
           {videos.map((project, index) => (
-            <div key={`${project.id}-dup`} className="w-[70vw] sm:w-[40vw] md:w-[25vw] lg:w-[22vw] flex-shrink-0">
+            <div key={`${project.id}-dup`} className="w-[60vw] sm:w-[35vw] md:w-[20vw] lg:w-[16vw] flex-shrink-0">
               <ShortVideoCard project={project} index={index} />
             </div>
           ))}
